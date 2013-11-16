@@ -22,11 +22,11 @@ class VMetadata < ActiveRecord::Base
   # many-to-many relationship: one video has several report places, translators and description tags;
 
   has_many :v_meta_translatorships
-  has_many :v_translators, :through => :v_meta_translatorships
+  has_many :g_translators, :through => :v_meta_translatorships
   has_many :v_meta_regionships
-  has_many :v_regions, :through => :v_meta_regionships
+  has_many :g_regions, :through => :v_meta_regionships
   has_many :v_meta_tagships
-  has_many :v_tags, :through => :v_meta_tagships
+  has_many :g_tags, :through => :v_meta_tagships
 
   # here check the parameters correctness
 
@@ -41,10 +41,13 @@ class VMetadata < ActiveRecord::Base
                       :with => %r{^.*\.(avi|mp4|flv)$|^$}i,
                       :message => "Video suffix should be AVI, MP4 or FLV."
 
-  validate :valid_date if !create_date.nil?
+  validate :valid_date
 
   def valid_date
-    errors.add(:create_date, 'must be a valid datetime') if ((DateTime.parse(create_date) rescue ArgumentError) == ArgumentError)
+    if !create_date.nil?
+      # TODO DataTime.parse need check right date time.
+      errors.add(:create_date, 'must be a valid datetime') if ((DateTime.parse(create_date) rescue ArgumentError) == ArgumentError)
+    end
   end
 
 end

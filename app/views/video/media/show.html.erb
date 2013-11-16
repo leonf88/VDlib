@@ -1,0 +1,92 @@
+<%= stylesheet_link_tag "flowplayer/skin/minimalist.css" %>
+<%= javascript_include_tag "video/flowplayer.min.js" %>
+<div class="video_info_list">
+  <div class="breadcrumb">
+    <ul>
+      <li><%= link_to "首页", "#" %> ></li>
+      <li><%= link_to @video_item.g_tags.first.g_topic.topic_chs, video_topic_path(@video_item.g_tags.first.g_topic.id) %> > </li>
+      <li><%= link_to @video_item.g_tags.first.tag,  detail_video_topic_path(@video_item.g_tags.first.id)%> > </li>
+      <li><%= @video_item.gsv_number %> </li>
+    </ul>
+  </div>
+  <div class="media">
+    <div class="m_title">
+      <h3><%= @video_item.title_chs %> </h3>
+      <span><%= @video_item.title_eng %></span>
+    </div>
+
+    <script language="JavaScript">
+        flowplayer("m_player", "flowplayer/flowplayer.swf");
+    </script>
+    <a id="m_player" class="m_player flowplayer" href="<%= @video_item.video_path %>"></a>
+
+    <div class="m_material">
+      <span><%= link_to "下载", @video_item.video_path %></span>
+    </div>
+    <div class="m_info">
+      <table>
+        <tr>
+          <td class="ml">
+            <span>视频编号：</span>
+          </td>
+          <td>
+            <span><%= @video_item.gsv_number %></span>
+          </td>
+        </tr>
+        <tr>
+          <td class="ml">
+            <span>视频简介：</span>
+          </td>
+          <td>
+            <span><%= @video_item.description %></span>
+          </td>
+        </tr>
+        <tr>
+          <td class="ml">
+            <span>拍摄地：</span>
+          </td>
+          <td>
+        <span>
+          <% @video_item.g_regions.each_with_index do |r, i| %>
+            <%= link_to r.name_chs, "/video/region/"+r.id.to_s %> <%= '|' if i < (@video_item.g_regions.size-1) %>
+          <% end %>
+        </span>
+          </td>
+        </tr>
+        <tr>
+          <td class="ml">
+            <span>影片来源：</span>
+          </td>
+          <td>
+            <span><%= link_to @video_item.v_provider.detail, "/video/provider/"+ @video_item.v_provider.id.to_s %></span>
+          </td>
+        </tr>
+        <tr>
+          <td class="ml">
+            <span>关键词：</span>
+          </td>
+          <td>
+          <span>
+            <% @video_item.g_tags.each_with_index do |t, i| %>
+                <%= link_to(t.tag, query_search_path(:qt => "kw", :qw => t.tag)) %> <%= '|' if i < (@video_item.g_tags.size-1) %>
+             <% end %>
+          </span>
+          </td>
+        </tr>
+        <% if @video_item.d_metadatas.length!=0 %>
+            <tr>
+              <td class="ml">
+                <span>文档资料：</span>
+              </td>
+              <td>
+
+              </td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="category_sidebar">
+  <%= render :partial => "/video/shared/topic_list" %>
+</div>

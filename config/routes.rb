@@ -1,4 +1,24 @@
 VDlib::Application.routes.draw do
+
+  root :to => "video/topic#index"
+  post "query/search" => "query#search"
+
+  namespace :video do
+    resources :topic do
+      member do
+        get "detail"
+      end
+    end
+
+    resources :media
+
+    #namespace :topic do
+    #
+    #  #match "index" => "index", :via => :get
+    #  #match "show/:id" => "show", :via => :get
+    #end
+  end
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
@@ -47,7 +67,7 @@ VDlib::Application.routes.draw do
   #   end
 
   # You can have the root of your site routed with "root"
-  # just remember to delete public/index.html.
+  # just remember to delete public/index.html.bak.
   # root :to => 'welcome#index'
 
   # See how all your routes lay out with "rake routes"

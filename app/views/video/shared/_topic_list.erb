@@ -1,0 +1,24 @@
+<%
+   @topics=GTopic.order('priority').all
+%>
+<div class="ctg_nav" id="ctg_nav">
+  <h3 class="heading">主题</h3>
+  <ul>
+    <% @topics.each do |ctg| %>
+        <li class="c_group">
+          <div>
+            <span style="font-weight: 600;font-style: italic;">
+            <%= link_to ctg.topic_chs, video_topic_path(ctg.id) %>
+          </span>
+          </div>
+          <div>
+            <% ctg.g_tags.each_with_index do |t, i| %>
+              <span>
+              <%= link_to t.tag, detail_video_topic_path(t.id) %>
+              </span>
+            <% end %></div>
+          <div class="clear"></div>
+        </li>
+    <% end %>
+  </ul>
+</div>

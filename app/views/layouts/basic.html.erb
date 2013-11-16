@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+  <title>地球纵观数字图书馆</title>
+  <%= javascript_include_tag "jquery.min" %>
+  <%= javascript_include_tag "jquery.ui.core.min" %>
+  <%= stylesheet_link_tag    "dlib", :media => "all" %>
+  <%= stylesheet_link_tag    "jquery.ui.core", :media => "all" %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+<div id="header">
+  <div class="top_info">
+    <span>建设机构：<a href="http://www.ict.ac.cn">中科院计算所</a></span>
+    <span>技术支持：<a href="#">前瞻实验室-分布式云计算小组</a></span>
+    <span class="top_info_right">建设者口号：“为了一个美丽的中国！”</span>
+
+    <div class="clear"></div>
+  </div>
+  <div class="log_sear">
+    <div class="sear">
+      <%= form_for(:search, :url => {:controller => "/query", :action => "search"}) do |f| %>
+          <%= select_tag(:qt, options_for_select('全部' => 'all', '拍摄地' => 'pl', '内容简介' => 'des', '关键词' => 'kw'), :class => "sear_opt") %>
+          <%= f.text_field "qw", :id => "sear_text", :class => "sear_text" %>
+          <!--<input type="text" id="sear_text" class="sear_text"/>-->
+          <%= f.submit "搜索", :class => "sear_btn" %>
+      <% end %>
+    </div>
+    <div class="clear"></div>
+  </div>
+  <div class="sub_info">地球纵观数字图书馆（Earthview）提供的资料有：影片、文稿和课件搞。资料仅用于公益性教育（<a href="#">见资料使用须知</a>）</div>
+</div>
+<div id="main">
+  <%= yield %>
+  <div class="clear"></div>
+</div>
+<div id="footer">
+  <div class="copyright">
+    <div>欢迎访问地球纵观数字图书馆　京ICP备05063507号</div>
+    <div>© 2013 地球纵观数字图书馆 <!-- 地址：****　邮编：**** E-mail：**** --></div>
+  </div>
+</div>
+</body>
+</html>

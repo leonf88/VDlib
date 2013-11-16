@@ -1,0 +1,39 @@
+<div class="video_info_list" id="v_list">
+  <div class="breadcrumb">
+    <ul>
+      <li><%= link_to "首页", "#" %> ></li>
+      <li><%= @topic_item.topic_chs %></li>
+    </ul>
+  </div>
+  <div class="container">
+    <% @topic_item.g_tags.each do |topic_tag| %>
+        <div class="f-list">
+          <div class="topic-tag">
+            <i><%= link_to topic_tag.tag, detail_video_topic_path(topic_tag.id) %></i>
+
+            <div class="more">
+              <%= link_to "查看更多", detail_video_topic_path(topic_tag.id) %>
+            </div>
+          </div>
+          <div class="vidbox rec">
+            <ul class="vd-list">
+              <% topic_tag.v_metadatas.paginate(:page => 1, :per_page => 12).each do |topic_tag| %>
+                  <li>
+                    <a href="<%= "/video/media/"+topic_tag.id.to_s %>" title="<%= topic_tag.title_chs %>">
+                      <div class="preview">
+                        <img src="<%= topic_tag.img_path %>" onerror="javascript:this.src='none.gif'"/>
+                      </div>
+                      <div class="title"><%= topic_tag.title_chs %></div>
+                    </a>
+                  </li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="category_sidebar">
+  <%= render :partial => "/video/shared/topic_list" %>
+</div>

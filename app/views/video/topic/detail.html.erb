@@ -1,0 +1,36 @@
+<div class="video_info_list">
+  <div class="breadcrumb">
+    <ul>
+      <li><%= link_to "首页", "#" %> ></li>
+      <li><%= link_to @gtag.g_topic.topic_chs, video_topic_path(@gtag.g_topic.id) %> ></li>
+      <li><%= @gtag.tag %> </li>
+    </ul>
+    <ul class="right">
+      <li id="icon-list">缩略图</li>
+      <li id="th-list">列表</li>
+    </ul>
+  </div>
+  <div class="vd-list-cnt">
+    <% if (@videos.length == 0) %>
+        <span>没有你要查找的内容</span>
+    <% else %>
+        <ul class="vd-list">
+          <% @videos.each_with_index do |v, i| %>
+              <li class="l1">
+                <a href="<%= "/video/media/"+v.id.to_s %>" title="<%= v.title_chs %>">
+                  <div class="preview">
+                    <img src="<%= v.img_path %>" onerror="javascript:this.src='/none.gif'"/>
+                  </div>
+                  <div class="title"><%= v.title_chs %></div>
+                </a>
+              </li>
+          <% end %>
+        </ul>
+        <%= will_paginate @videos, :id => "digg_pagination", :class => "digg_pagination", :previous_label => "<<", :next_label => ">>", :outer_window => "1" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="category_sidebar">
+  <%= render :partial => "/video/shared/topic_list" %>
+</div>

@@ -1,0 +1,159 @@
+<%= javascript_include_tag "video/jquery.uploadify.js" %>
+<script type="text/javascript">
+    // TODO
+    $(function () {
+        $.updateDoneList = $.fn.updateDoneList = function (tableBlock, fileListBlock, token) {
+            $.getJSON("upload/list", {}, function (result) {
+                if (result['flag'] == true) {
+                    var data = result['data']
+                    if (data.length == 0)
+                        fileListBlock.html("没有上传的视频文件")
+                    else {
+                        fileListBlock.html("")
+                        var i = 1
+                        for (var a in data) {
+                            var ytd = $("<tr/>").attr('class', 'video-' + data[a]['id'])
+                            ytd.append($('<td/>').attr("class", "item-index").append($('<input>').val(data[a]['id']).attr("type", "checkbox").attr("class", "checkbox-item-hook")).append($('<span/>').attr("class", "index-hook").html(0)))
+                                    .append($('<td/>').attr("class", "filename").html('<input disabled value="' + data[a]['filename'] + '"/>'))
+                                    .append($('<td/>').attr("class", "info").html('<input disabled value="' + $.formatVideoInfo(data[a]) + '"/>'))
+                                    .append($('<td/>').attr("class", "time").html('<input disabled value="' + data[a]['created_at'] + '"/>'))
+                                    .append($('<td/>').attr('class', 'others')
+                                            .append($("<a/>").attr("href", "upload/download/" + data[a]['id']).attr('title', '下载').attr('class', 'ui-state-default ui-corner-all need-hover').append($('<span/>').attr('class', 'ui-icon ui-icon-arrowthick-1-s')))
+                                            .append($("<a/>").attr("href", "javascript:$.showVideoInfoFromUpload('" + data[a]['id'] + "')").attr('title', '详细信息').attr('class', 'ui-state-default ui-corner-all need-hover').append($('<span/>').attr('class', 'ui-icon ui-icon-info')))
+                                            // .append($('<a/>').attr("href", "javascript:$.deleteFiles([" + data[a]['id'] + "],'" + token + "')").attr('title', '删除记录').attr('class', 'cancel ui-state-default ui-corner-all need-hover').append($('<span/>').attr('class', 'ui-icon ui-icon-trash')))
+                                    )
+                            fileListBlock.append(ytd)
+                        }
+                        $.updateIndexNum(fileListBlock, "item-index")
+                        $.bindCheckboxAll(tableBlock)
+                        $.bindHover()
+                    }
+                }
+            })
+        }
+
+        $("#add_files").uploadify({
+            'swf': 'uploadify.swf',
+            'uploader': "upload",
+            'buttonText': '+',
+            'auto': false,
+            'removeCompleted': false,
+            'width': 25,
+            'height': 25,
+            'queueID': 'upload_queue_list',
+            'multi': false,
+            'truncateLength': 0,
+            'buttonClass': 'ui-state-default ui-corner-all need-hover',
+            'fileTypeExts': '',
+            'fileTypeDesc': '支持视频格式：',
+            'itemTemplate': '<tr id="${fileID}" class="uploadify-queue-item">\
+                <td class="item-index"><input type="checkbox" class="checkbox-item-hook" value="${fileID}"/><span class="index-hook"></span></td>\
+                <td class="status">准备</td>\
+                <td class="filename"><input value="${fileName}" disabled/></td>\
+                <td class="data-size">${fileSize}</td> \
+                <td class="speed"></td>\
+                <td class="progress"><span class="percentage"></span><div class="uploadify-progress-bar"></div></td>\
+                <td class="path"></td>\
+                </tr>',
+            'onSelect': function (file) {
+            },
+            'onDialogClose': function (queueData) {
+                var queueLength = queueData.queueLength
+
+                $.updateIndexNum($("#" + this.settings.queueID), "item-index");
+                $.bindCheckboxAll($("#" + this.settings.queueID).parent());
+                if (queueData.queueLength != 0) {
+                    $("#upload_main").tabs("disable")
+                    var files = {};
+                    for (var d in queueData.files) {
+                        files[d] = queueData.files[d].name
+                        $("#" + d).find('.status').html('检查')
+                    }
+
+                    $.post('upload/check', {data: files, authenticity_token: auth_token}, function (result) {
+                        if (!result['error']) {
+                            var succ_files = $.extend({}, files);
+                            console.log(succ_files)
+                            if (!result['flag']) {
+                                for (var d in result['data']) {
+                                    $("#" + d).remove();
+                                    queueLength -= 1
+                                    $('#add_files').uploadify('cancel', [d])
+                                    delete succ_files[d];
+                                    alert(result['data'][d]['msg'])
+                                }
+                            }
+                            for (var d in succ_files)
+                                $("#" + d).find('.status').html('准备')
+                        }
+
+                        console.log(queueData)
+                        if (queueLength == 0) {
+                            $("#upload_main").tabs("enable")
+                        }
+                    }, 'json')
+                }
+            },
+            'onUploadStart': function (file) {
+                $("#" + file.id).find('.status').html("上传")
+            },
+            'onUploadSuccess': function (file, data, response) {
+                var result = JSON.parse(data);
+                if (result['flag'] == true) {
+                    $('#' + file.id).find('.status').html("完成");
+                    $('#' + file.id).find('.uploadify-progress-bar').remove();
+                    $('#' + file.id).fadeOut(500, function () {
+                        $(this).remove();
+                    });
+                    $.updateDoneList($("#upload_done .file-list"), $("#upload_done_list"), auth_token);
+                    $.updateIndexNum($("#" + this.settings.queueID), "item-index");
+                    $.bindCheckboxAll($("#" + this.settings.queueID));
+                } else {
+                    $("#" + file.id).find('.status').css('color', 'red').html("出错");
+                }
+                this.queueData.queueLength -= 1;
+                delete this.queueData.files[file.id]
+            },
+            'onQueueComplete': function () {
+                $("#upload_main").tabs("enable")
+            },
+            'onFallback': function () {
+                alert("您未安装FLASH控件，无法上传文件！请安装FLASH控件后再试。");
+            }
+        })
+    })
+</script>
+
+<div class="">
+  <div class="vd-upload">
+    <span class="notice">提示：允许的上传格式包括 xxx。文件大小限制在 xxx 以内</span>
+    <input id="add_files" class="ui-state-default ui-corner-all need-hover" name="add_files" type="file" multiple="false"/>
+  </div>
+  <div class="vd-info">
+    <%= form_for @video_item, :url => {:controller => 'media', :action => 'create'} do |f| %>
+        <ul>
+          <li><label>编号：</label><%= f.text_field :gsv_number %></li>
+          <li><label>中文名：</label><%= f.text_field :title_chs %></li>
+          <li><label>英文名：</label><%= f.text_field :title_eng %></li>
+          <li><label>音频语言：</label><%= f.text_field :audio_language %></li>
+          <li><label>字母语言：</label><%= f.text_field :subtitle_language %></li>
+          <li><label>播放时间：</label></li>
+          <li><label>视频录制时间：</label></li>
+          <li>
+            <div class="vd-translators">添加资料整理人员</div>
+          </li>
+          <li>
+            <div class="vd-regions">添加拍摄地</div>
+          </li>
+          <li>
+            <div class="vd-tags">添加标签</div>
+          </li>
+          <li><label>视频简介：</label><%= f.text_area :description %></li>
+          <li>
+            <div class="vd-document">文档关联</div>
+          </li>
+          <li><%= f.submit "提交" %></li>
+        </ul>
+    <% end %>
+  </div>
+</div>

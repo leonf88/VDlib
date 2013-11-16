@@ -1,0 +1,38 @@
+﻿<div class="topic_group" id="topic_group">
+  <span><h3>影视资料分类目录 欢迎查阅</h3></span>
+  <ul>
+    <% @topics.each do |ctg| %>
+        <li>
+          <span class="topic_name">
+            <a href="<%= video_topic_path(ctg.id) %>">
+              <p><%= ctg.topic_chs %></p>
+              <p><%= ctg.topic_eng %></p>
+            </a>
+          </span>
+        </li>
+    <% end %>
+  </ul>
+</div>
+
+
+<script type="text/javascript">
+    var maxh = 0  , cnt = 0
+    var liArr = new Array()
+    var lstp = $('#topic_group li')
+    lstp.each(function (cnt) {
+        if (maxh < $(this).height()) {
+            maxh = $(this).height()
+        }
+        liArr.push($(this))
+
+        var blockNumPerLine = 4
+        if (cnt % blockNumPerLine == (blockNumPerLine - 1) || cnt == (lstp.length - 1)) {
+            $.each(liArr, function (n, obj) {
+                obj.height(maxh)
+            })
+            liArr = []
+            maxh = 0
+        }
+    })
+</script>
+

@@ -1,3 +1,4 @@
+# encoding: utf-8
 class DMetadata < ActiveRecord::Base
 
   attr_accessible :gsd_number, :title_eng, :title_chs
@@ -9,9 +10,9 @@ class DMetadata < ActiveRecord::Base
   # many-to-many relationship: one document has several tags and translators
 
   has_many :d_meta_tagships
-  has_many :d_tags, :through => :d_meta_tagships
+  has_many :g_tags, :through => :d_meta_tagships
   has_many :d_meta_translatorships
-  has_many :d_translators, :through => :d_meta_translatorships
+  has_many :g_translators, :through => :d_meta_translatorships
 
   # here check the parameters correctness
 
