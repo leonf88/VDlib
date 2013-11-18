@@ -19,6 +19,11 @@ end
 gem 'execjs'
 gem 'therubyracer'
 gem 'thin'
-gem 'thinking-sphinx'
+#gem 'thinking-sphinx', '~> 3.0.6'
+gem 'thinking-sphinx', '2.0.10'
 gem 'devise'
 gem 'will_paginate', '~> 3.0'
+
+# For rails console
+gem 'rb-readline'
+gem 'spreadsheet'

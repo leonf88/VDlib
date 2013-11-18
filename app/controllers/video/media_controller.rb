@@ -4,29 +4,11 @@ class Video::MediaController < ApplicationController
 
   # Get one video detail information, which used in the play view page.
   def show
-    @video_item=VMetadata.find(params[:id])
-  end
-
-  def new
-    @video_item=VMetadata.new
-  end
-
-  def create
-    @video_item=VMetadata.new(params[:video_item])
-    @video_item.save
-  end
-
-  def edit
-    @video_item=VMetadata.find(params[:id])
-  end
-
-  def update
-    @event = Event.find(params[:id])
-    @event.update_attributes(params[:event])
-  end
-
-  def delete
-    @event = Event.find(params[:id])
-    @event.destroy
+    begin
+      @video_item=VMetadata.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      render(:file => "#{Rails.root}/public/404.html",
+             :status => "404 Not Found")
+    end
   end
 end

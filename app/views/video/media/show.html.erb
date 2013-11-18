@@ -1,29 +1,49 @@
-<%= stylesheet_link_tag "flowplayer/skin/minimalist.css" %>
 <%= javascript_include_tag "video/flowplayer.min.js" %>
-<div class="video_info_list">
+<div class="vd-cnt">
   <div class="breadcrumb">
     <ul>
-      <li><%= link_to "首页", "#" %> ></li>
-      <li><%= link_to @video_item.g_tags.first.g_topic.topic_chs, video_topic_path(@video_item.g_tags.first.g_topic.id) %> > </li>
-      <li><%= link_to @video_item.g_tags.first.tag,  detail_video_topic_path(@video_item.g_tags.first.id)%> > </li>
+      <li><%= link_to "首页", root_path %> ></li>
+      <li><%= link_to @video_item.g_subtopics.first.g_topic.topic_chs, video_topic_path(@video_item.g_subtopics.first.g_topic.id) %>
+        >
+      </li>
+      <li><%= link_to @video_item.g_subtopics.first.topic_chs, video_topic_detail_path(@video_item.g_subtopics.first.id) %>
+        >
+      </li>
       <li><%= @video_item.gsv_number %> </li>
     </ul>
   </div>
   <div class="media">
-    <div class="m_title">
+    <div class="m-t">
       <h3><%= @video_item.title_chs %> </h3>
-      <span><%= @video_item.title_eng %></span>
+      <h4><%= @video_item.title_eng %></h4>
     </div>
-
+    <div id="m_player" class="m-p"></div>
     <script language="JavaScript">
-        flowplayer("m_player", "flowplayer/flowplayer.swf");
+        flowplayer("m_player", "/flowplayer.swf", {
+            plugins: {
+                controls: {
+                    url: '/flowplayer.controls.swf'
+                },
+                pseudo: {
+                    url: "/flowplayer.pseudostreaming.swf"
+                }
+            },
+            clip: {
+                // our clip uses pseudostreaming
+                provider: 'pseudo',
+                url: '<%="/"+@video_item.video_path %>',
+                autoPlay: false
+            }
+        });
     </script>
-    <a id="m_player" class="m_player flowplayer" href="<%= @video_item.video_path %>"></a>
 
-    <div class="m_material">
-      <span><%= link_to "下载", @video_item.video_path %></span>
+    <div class="m-mtr">
+      <span><%= link_to "视频下载", "/"+@video_item.video_path %></span>
+      <% if @video_item.d_metadatas.length!=0 %>
+          <span><%= link_to "文档下载", "/"+@video_item.d_metadatas.first.doc_path %></span>
+      <% end %>
     </div>
-    <div class="m_info">
+    <div class="m-info">
       <table>
         <tr>
           <td class="ml">
@@ -48,7 +68,7 @@
           <td>
         <span>
           <% @video_item.g_regions.each_with_index do |r, i| %>
-            <%= link_to r.name_chs, "/video/region/"+r.id.to_s %> <%= '|' if i < (@video_item.g_regions.size-1) %>
+            <%= link_to r.name_chs, video_region_path(r.id) %> <%= '|' if i < (@video_item.g_regions.size-1) %>
           <% end %>
         </span>
           </td>
@@ -58,7 +78,7 @@
             <span>影片来源：</span>
           </td>
           <td>
-            <span><%= link_to @video_item.v_provider.detail, "/video/provider/"+ @video_item.v_provider.id.to_s %></span>
+            <span><%= link_to @video_item.v_provider.detail, video_provider_path(@video_item.v_provider.id) %></span>
           </td>
         </tr>
         <tr>
@@ -68,25 +88,15 @@
           <td>
           <span>
             <% @video_item.g_tags.each_with_index do |t, i| %>
-                <%= link_to(t.tag, query_search_path(:qt => "kw", :qw => t.tag)) %> <%= '|' if i < (@video_item.g_tags.size-1) %>
+                <%= link_to(t.tag, video_tag_path(t.id)) %> <%= '|' if i < (@video_item.g_tags.size-1) %>
              <% end %>
           </span>
           </td>
         </tr>
-        <% if @video_item.d_metadatas.length!=0 %>
-            <tr>
-              <td class="ml">
-                <span>文档资料：</span>
-              </td>
-              <td>
-
-              </td>
-            </tr>
-        <% end %>
       </table>
     </div>
   </div>
 </div>
-<div class="category_sidebar">
-  <%= render :partial => "/video/shared/topic_list" %>
+<div class="ctg-bar">
+  <%= render :partial => "/video/shared/topic_list_html" %>
 </div>

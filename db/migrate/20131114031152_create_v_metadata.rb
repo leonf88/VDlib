@@ -7,8 +7,9 @@ class CreateVMetadata < ActiveRecord::Migration
       t.string :audio_language, :limit => 20
       t.string :subtitle_language, :limit => 20
       t.text :description, :limit => 2000
-      t.integer :duration, :default => 0
-      t.date :create_date
+      t.text :qwords, :limit => 200
+      t.string :duration, :default => "00:00:00"
+      t.string :create_date
 
       t.string :video_path, :limit => 100
       t.string :img_path, :limit => 100
@@ -17,6 +18,7 @@ class CreateVMetadata < ActiveRecord::Migration
 
       t.references :v_clarity
       t.references :v_provider
+      t.boolean :delta, :default => false, :null => false
 
       t.timestamps
     end

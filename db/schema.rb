@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131114120727) do
+ActiveRecord::Schema.define(:version => 20131116134645) do
 
   create_table "d_meta_regionships", :id => false, :force => true do |t|
     t.integer  "d_metadata_id", :null => false
@@ -22,6 +22,16 @@ ActiveRecord::Schema.define(:version => 20131114120727) do
 
   add_index "d_meta_regionships", ["d_metadata_id"], :name => "fk_dmeta_reg"
   add_index "d_meta_regionships", ["g_region_id"], :name => "fk_reg_dmeta"
+
+  create_table "d_meta_subtopicships", :force => true do |t|
+    t.integer  "d_metadata_id", :null => false
+    t.integer  "g_subtopic_id", :null => false
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
+  add_index "d_meta_subtopicships", ["d_metadata_id"], :name => "fk_dmeta_subtopic"
+  add_index "d_meta_subtopicships", ["g_subtopic_id"], :name => "fk_subtopic_dmeta"
 
   create_table "d_meta_tagships", :id => false, :force => true do |t|
     t.integer  "d_metadata_id", :null => false
@@ -44,12 +54,15 @@ ActiveRecord::Schema.define(:version => 20131114120727) do
   add_index "d_meta_translatorships", ["g_translator_id"], :name => "fk_trans_dmeta"
 
   create_table "d_metadata", :force => true do |t|
-    t.string   "gsd_number",    :limit => 20,  :null => false
-    t.string   "title_eng",     :limit => 50,  :null => false
-    t.string   "title_chs",     :limit => 100, :null => false
+    t.string   "gsd_number",    :limit => 20,                     :null => false
+    t.string   "title_eng",     :limit => 50,                     :null => false
+    t.string   "title_chs",     :limit => 100,                    :null => false
+    t.text     "qwords",        :limit => 255
+    t.string   "doc_path",      :limit => 100
     t.integer  "v_metadata_id"
-    t.datetime "created_at",                   :null => false
-    t.datetime "updated_at",                   :null => false
+    t.boolean  "delta",                        :default => false, :null => false
+    t.datetime "created_at",                                      :null => false
+    t.datetime "updated_at",                                      :null => false
   end
 
   add_index "d_metadata", ["v_metadata_id"], :name => "fk_v_meta"
@@ -61,12 +74,21 @@ ActiveRecord::Schema.define(:version => 20131114120727) do
     t.datetime "updated_at",                :null => false
   end
 
+  create_table "g_subtopics", :force => true do |t|
+    t.string   "topic_chs",  :limit => 50,                :null => false
+    t.string   "topic_eng",  :limit => 25,                :null => false
+    t.integer  "priority",                 :default => 0
+    t.integer  "v_count",                  :default => 0
+    t.integer  "d_count",                  :default => 0
+    t.integer  "g_topic_id"
+    t.datetime "created_at",                              :null => false
+    t.datetime "updated_at",                              :null => false
+  end
+
   create_table "g_tags", :force => true do |t|
     t.string   "tag",        :limit => 100
-    t.integer  "grade",                     :default => 0
     t.integer  "v_count",                   :default => 0
     t.integer  "d_count",                   :default => 0
-    t.integer  "g_topic_id"
     t.datetime "created_at",                               :null => false
     t.datetime "updated_at",                               :null => false
   end
@@ -101,6 +123,16 @@ ActiveRecord::Schema.define(:version => 20131114120727) do
   add_index "v_meta_regionships", ["g_region_id"], :name => "fk_reg_vmeta"
   add_index "v_meta_regionships", ["v_metadata_id"], :name => "fk_vmeta_reg"
 
+  create_table "v_meta_subtopicships", :force => true do |t|
+    t.integer  "v_metadata_id", :null => false
+    t.integer  "g_subtopic_id", :null => false
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
+  add_index "v_meta_subtopicships", ["g_subtopic_id"], :name => "fk_subtopic_vmeta"
+  add_index "v_meta_subtopicships", ["v_metadata_id"], :name => "fk_vmeta_subtopic"
+
   create_table "v_meta_tagships", :id => false, :force => true do |t|
     t.integer  "v_metadata_id", :null => false
     t.integer  "g_tag_id",      :null => false
@@ -122,21 +154,23 @@ ActiveRecord::Schema.define(:version => 20131114120727) do
   add_index "v_meta_translatorships", ["v_metadata_id"], :name => "fk_vmeta_trans"
 
   create_table "v_metadata", :force => true do |t|
-    t.string   "gsv_number",        :limit => 20,                 :null => false
-    t.string   "title_eng",         :limit => 50,                 :null => false
-    t.string   "title_chs",         :limit => 100,                :null => false
+    t.string   "gsv_number",        :limit => 20,                          :null => false
+    t.string   "title_eng",         :limit => 50,                          :null => false
+    t.string   "title_chs",         :limit => 100,                         :null => false
     t.string   "audio_language",    :limit => 20
     t.string   "subtitle_language", :limit => 20
     t.text     "description"
-    t.integer  "duration",                         :default => 0
-    t.date     "create_date"
+    t.text     "qwords",            :limit => 255
+    t.string   "duration",                         :default => "00:00:00"
+    t.string   "create_date"
     t.string   "video_path",        :limit => 100
     t.string   "img_path",          :limit => 100
     t.integer  "counter",                          :default => 0
     t.integer  "v_clarity_id"
     t.integer  "v_provider_id"
-    t.datetime "created_at",                                      :null => false
-    t.datetime "updated_at",                                      :null => false
+    t.boolean  "delta",                            :default => false,      :null => false
+    t.datetime "created_at",                                               :null => false
+    t.datetime "updated_at",                                               :null => false
   end
 
   add_index "v_metadata", ["v_clarity_id"], :name => "fk_v_clarity"

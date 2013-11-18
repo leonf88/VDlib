@@ -1,53 +1,73 @@
 class QueryController < ApplicationController
+  layout "basic"
+  require 'thinking_sphinx'
 
-  # Query the documents/videos according to the key words
+  @@per_page=28
+
+  # Get resources information according to the Region
+  def region
+    begin
+      r=GRegion.find(params[:id])
+      @videos=r.v_metadatas.paginate(:page => params[:page], :per_page => @@per_page)
+      @query_info=r.name_chs
+
+      respond_to do |format|
+        format.html { render 'query/show' }
+      end
+    rescue ActiveRecord::RecordNotFound
+      render(:file => "#{Rails.root}/public/404.html",
+             :status => "404 Not Found")
+    end
+  end
+
+  # Get resources information according to the Provider
+  def provider
+    begin
+      p=VProvider.find(params[:id])
+      @videos=p.v_metadatas.paginate(:page => params[:page], :per_page => @@per_page)
+      @query_info=p.detail
+
+      respond_to do |format|
+        format.html { render 'query/show' }
+      end
+    rescue ActiveRecord::RecordNotFound
+      render(:file => "#{Rails.root}/public/404.html",
+             :status => "404 Not Found")
+    end
+  end
+
+  # Get resources information according to the Key Word Tags
+  def tag
+    begin
+      t=GTag.find(params[:id])
+      @videos=t.v_metadatas.paginate(:page => params[:page], :per_page => @@per_page)
+      @query_info=t.tag
+
+      respond_to do |format|
+        format.html { render 'query/show' }
+      end
+    rescue ActiveRecord::RecordNotFound
+      render(:file => "#{Rails.root}/public/404.html",
+             :status => "404 Not Found")
+    end
+  end
+
+  # Get the resources according to the key words in Region, Provider, Description, etc.
   def search
-    # TODO
-    params[:page]=1 if (params[:page] == nil || Integer(params[:page]) < 0)
-    @page_info={}
-    if (params[:qw] !=nil && params[:qw].strip !="")
-      key_word= params[:qw]
-    elsif (params[:search][:qw] !=nil && params[:search][:qw].strip !="")
-      key_word= params[:search][:qw]
-    else
-      flash[:notice]= "query condition can't be empty!"
-    end
-    case params[:qt]
-      when 'kw'
-        # search in the keywords
-        videos_info=VMetadata.search(:conditions => {:keywords => key_word}, :page => params[:page],
-                                     :per_page => $default_perpage_size, :match_mode => :any, :rank_mode => :proximity_bm25)
-      when 'pl'
-        # search in the places
-        videos_info=VMetadata.search(:conditions => {:place => key_word}, :page => params[:page],
-                                     :per_page => $default_perpage_size, :match_mode => :any, :rank_mode => :proximity_bm25)
-      when 'des'
-        # search in the descriptions
-        videos_info=VMetadata.search(:conditions => {:description => key_word}, :page => params[:page],
-                                     :per_page => $default_perpage_size, :match_mode => :any, :rank_mode => :proximity_bm25)
-      else
-        # search in all the information
-        videos_info=VMetadata.search(key_word, :page => params[:page], :per_page => $default_perpage_size, :match_mode => :any, :rank_mode => :proximity_bm25)
-    end
-    @page_info[:cls_title]="查询词："+ key_word
-    @page_info[:base_path]=$video_path_prefix +File::SEPARATOR
-    @page_info[:videos_info]=videos_info
-    respond_to do |format|
-      format.html { render 'video/media/list' }
-      format.json {
-        v_info=[]
-        videos_info.each do |v|
-          video_item={}
-          video_item[:video_id]=v.id.to_s
-          video_item[:title_chs]= v.title_chs
-          video_item[:title_eng]=v.title_eng
-          video_item[:description]=truncate(v.description, :length => 50)
-          video_item[:img_path]=v.img_path
+    begin
+      words= params[:search][:qw].strip
+      @query_info=words
 
-          v_info<<video_item
-        end
-        render :json => {:videos_info => v_info}
-      }
+      # search in the descriptions
+      @videos=VMetadata.search(words, :page => params[:page], :per_page => @@per_page,
+                               :match_mode => :any, :rank_mode => :proximity_bm25)
+
+      respond_to do |format|
+        format.html { render 'query/show' }
+      end
+    rescue ActiveRecord::RecordNotFound
+      render(:file => "#{Rails.root}/public/404.html",
+             :status => "404 Not Found")
     end
   end
 

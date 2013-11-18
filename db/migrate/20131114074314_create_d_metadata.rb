@@ -4,8 +4,11 @@ class CreateDMetadata < ActiveRecord::Migration
       t.string :gsd_number, :limit => 20, :null => false
       t.string :title_eng, :limit => 50, :null => false
       t.string :title_chs, :limit => 100, :null => false
+      t.text :qwords, :limit => 200
+      t.string :doc_path, :limit => 100
 
       t.references :v_metadata
+      t.boolean :delta, :default => false, :null => false
 
       t.timestamps
     end

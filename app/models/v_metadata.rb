@@ -6,9 +6,11 @@ class VMetadata < ActiveRecord::Base
   # img_path is the directory for multi-pictures or the absolute one-picture path;
 
   attr_accessible :gsv_number, :title_eng, :title_chs,
-                  :audio_language, :subtitle_language, :description, :duration, :create_date,
+                  :audio_language, :subtitle_language, :description, :duration, :create_date, :qwords,
                   :video_path, :img_path,
-                  :counter
+                  :v_clarity_id, :v_provider_id,
+                  :counter,
+                  :delta
 
   # many-to-one relationship: one video has one type clarity, one provider
 
@@ -27,6 +29,8 @@ class VMetadata < ActiveRecord::Base
   has_many :g_regions, :through => :v_meta_regionships
   has_many :v_meta_tagships
   has_many :g_tags, :through => :v_meta_tagships
+  has_many :v_meta_subtopicships
+  has_many :g_subtopics, :through => :v_meta_subtopicships
 
   # here check the parameters correctness
 
@@ -46,8 +50,17 @@ class VMetadata < ActiveRecord::Base
   def valid_date
     if !create_date.nil?
       # TODO DataTime.parse need check right date time.
+      return
       errors.add(:create_date, 'must be a valid datetime') if ((DateTime.parse(create_date) rescue ArgumentError) == ArgumentError)
     end
   end
 
+  define_index do
+    indexes :title_eng
+    indexes :title_chs
+    indexes :description
+    indexes :qwords
+
+    set_property :delta => false
+  end
 end

@@ -1,0 +1,14 @@
+<div class="vd-cnt">
+  <div class="breadcrumb">
+    <ul>
+      <li><%= link_to "首页", root_path %> ></li>
+      <li>查询：[<%= @query_info %>]</li>
+    </ul>
+  </div>
+
+  <%= render :partial => "/video/shared/video_list" %>
+</div>
+
+<div class="ctg-bar">
+  <%= render :partial => "/video/shared/topic_list" %>
+</div>
