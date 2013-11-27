@@ -20,12 +20,12 @@ Ubuntu环境下根据之前Blog所述安装ruby和rails开发环境，使用mysq
 
 2. 初始化 rails 工程数据库
 
-    $ rake db:create 
-    $ rake db:migrate
+        $ rake db:create 
+        $ rake db:migrate
 
 3. 启动 test 服务
 
-    $ rails server thin
+        $ rails server thin
     
 ### 网站设计与开发
 
