@@ -105,18 +105,18 @@ class LoadUtil
   end
 
   def insertDOCOneRow(row)
-    base_dir="/media/新加卷_/Documents/Project/VegaDLib/档案整理/20120912/document"
+    base_dir="/media/新加卷__/Documents/Project/VegaDLib/档案整理/20120912/document/"
+    ss=base_dir.size
     file_path=`find #{base_dir} -type f -name "#{row[0]}*"`.strip.split("\n")
 
-    if file_path.length >1
-      raise Exception("#{row[0]} has more than one documents.")
+    if file_path.length > 1 or file_path.length == 0
+      print("#{row[0]} has more than one documents.")
     end
-    p file_path[0][53..-1]
     record={}
     record[:meta]={
         :gsd_number => row[0],
         :title_chs => row[1],
-        :doc_path => "files/"+file_path[0][53..-1]
+        :doc_path => File.join('files','docs',file_path[0][ss..-1])
     }
     record[:trans]= row[2] != nil ? row[2].split(%r{[；;、]}i) : []
     record[:regs]= row[3] != nil ? row[3].split(%r{[；;、]}i) : []

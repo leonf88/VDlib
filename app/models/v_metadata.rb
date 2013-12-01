@@ -56,6 +56,7 @@ class VMetadata < ActiveRecord::Base
   end
 
   define_index do
+    indexes :gsv_number
     indexes :title_eng
     indexes :title_chs
     indexes :description

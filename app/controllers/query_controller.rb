@@ -40,8 +40,11 @@ class QueryController < ApplicationController
   def tag
     begin
       t=GTag.find(params[:id])
-      @videos=t.v_metadatas.paginate(:page => params[:page], :per_page => @@per_page)
       @query_info=t.tag
+
+      # search in the descriptions
+      @videos=VMetadata.search(t.tag, :page => params[:page], :per_page => @@per_page,
+                               :match_mode => :any, :rank_mode => :proximity_bm25)
 
       respond_to do |format|
         format.html { render 'query/show' }
@@ -49,6 +52,15 @@ class QueryController < ApplicationController
     rescue ActiveRecord::RecordNotFound
       render(:file => "#{Rails.root}/public/404.html",
              :status => "404 Not Found")
+#     @videos=t.v_metadatas.paginate(:page => params[:page], :per_page => @@per_page)
+#     @query_info=t.tag
+
+#     respond_to do |format|
+#       format.html { render 'query/show' }
+#     end
+#   rescue ActiveRecord::RecordNotFound
+#     render(:file => "#{Rails.root}/public/404.html",
+#            :status => "404 Not Found")
     end
   end
 
